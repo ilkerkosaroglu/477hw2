@@ -27,6 +27,38 @@ using namespace std;
 void Scene::forwardRenderingPipeline(Camera *camera)
 {
 	// TODO: Implement this function.
+
+	for(auto m: meshes){
+		Matrix4 T(getIdentityMatrix());
+
+		//model transformations
+		for(int i=0;i<m->numberOfTransformations;i++){
+			int id=m->transformationIds[i];
+			char type=m->transformationTypes[i];
+			if(type=='r'){
+				T = multiplyMatrixWithMatrix(rotations[id]->getMatrix(),T);
+			}else if(type == 't'){
+				T = multiplyMatrixWithMatrix(translations[id]->getMatrix(),T);
+			}else if(type == 's'){
+				T = multiplyMatrixWithMatrix(scalings[id]->getMatrix(),T);
+			}else{
+				cerr<<"something went wrong."<<endl;
+			}
+		}
+
+		//world to camera transformation
+		
+		//camera to view transformation
+
+		//clipping & culling 
+		for(auto t: m->triangles){
+			//something something
+		}
+
+		//view to viewport transformation
+
+		//rasterizer
+	}
 }
 
 /*

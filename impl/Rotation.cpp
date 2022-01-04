@@ -1,4 +1,5 @@
 #include "Rotation.h"
+#include "Helpers.h"
 #include <iostream>
 #include <iomanip>
 
@@ -13,6 +14,17 @@ Rotation::Rotation(int rotationId, double angle, double x, double y, double z)
     this->ux = x;
     this->uy = y;
     this->uz = z;
+}
+
+Matrix4 Rotation::getMatrix(){
+    if(initializedMatrix){
+        return matrix;
+    }
+
+    matrix = getIdentityMatrix();
+
+    initializedMatrix = true;
+    return matrix;
 }
 
 ostream &operator<<(ostream &os, const Rotation &r)

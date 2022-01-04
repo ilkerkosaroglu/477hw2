@@ -1,4 +1,5 @@
 #include "Scaling.h"
+#include "Helpers.h"
 #include <iostream>
 #include <iomanip>
 
@@ -12,6 +13,17 @@ Scaling::Scaling(int scalingId, double sx, double sy, double sz)
     this->sx = sx;
     this->sy = sy;
     this->sz = sz;
+}
+
+Matrix4 Scaling::getMatrix(){
+    if(initializedMatrix){
+        return matrix;
+    }
+
+    matrix = getIdentityMatrix();
+
+    initializedMatrix = true;
+    return matrix;
 }
 
 ostream &operator<<(ostream &os, const Scaling &s)
