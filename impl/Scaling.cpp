@@ -21,6 +21,9 @@ Matrix4 Scaling::getMatrix(){
     }
 
     matrix = getIdentityMatrix();
+    matrix.val[0][0]=sx;
+    matrix.val[1][1]=sy;
+    matrix.val[2][2]=sz;
 
     initializedMatrix = true;
     return matrix;

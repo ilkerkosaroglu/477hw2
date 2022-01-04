@@ -27,6 +27,9 @@ Matrix4 Translation::getMatrix(){
     }
 
     matrix = getIdentityMatrix();
+    matrix.val[0][3]=tx;
+    matrix.val[1][3]=ty;
+    matrix.val[2][3]=tz;
 
     initializedMatrix = true;
     return matrix;
