@@ -42,6 +42,8 @@ public:
     Camera(const Camera &other);
 
     Matrix4 getMatrix();
+    Matrix4 computeCameraMatrix();
+    Matrix4 computeCVVMatrix();
 
     friend std::ostream &operator<<(std::ostream &os, const Camera &c);
 };

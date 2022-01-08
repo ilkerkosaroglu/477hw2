@@ -56,11 +56,7 @@ Camera::Camera(const Camera &other)
     this->outputFileName = other.outputFileName;
 }
 
-Matrix4 Camera::getMatrix(){
-    if(initializedMatrix){
-        return matrix;
-    }
-
+Matrix4 Camera::computeCameraMatrix(){
     Matrix4 translation = getIdentityMatrix();
     translation.val[0][3]=pos.x;
     translation.val[1][3]=pos.y;
@@ -69,7 +65,38 @@ Matrix4 Camera::getMatrix(){
     double basis[4][4] = {{u.x,u.y,u.z,0},{v.x,v.y,v.z,0},{w.x,w.y,w.z,0},{0,0,0,1}};
     Matrix4 basisMatrix(basis);
 
-    matrix = multiplyMatrixWithMatrix(basis,translation);
+    return multiplyMatrixWithMatrix(basis, translation);
+}
+
+Matrix4 Camera::computeCVVMatrix(){
+    Matrix4 M = getIdentityMatrix();
+
+    double oVal[4][4] = {{2/(right-left),0,0,0},{0,2/(top-bottom),0,0},{0,0,-2/(far-near),0},{0,0,0,1}};
+    oVal[0][3] = -(right+left)/(right-left);
+    oVal[1][3] = -(top+bottom)/(top-bottom);
+    oVal[2][3] = -(far+near)/(far-near);
+    Matrix4 ortho(oVal);
+
+    //if perspective
+    if(projectionType == 0){
+        double pVal[4][4] = {{near,0,0,0},{0,near,0,0},{0,0,far+near,far*near},{0,0,-1,0}};
+        Matrix4 pers(pVal);
+        M = multiplyMatrixWithMatrix(pers,M);
+    }
+
+    M = multiplyMatrixWithMatrix(ortho, M);
+    return M;
+}
+
+Matrix4 Camera::getMatrix(){
+    if(initializedMatrix){
+        return matrix;
+    }
+
+    Matrix4 camTransform = computeCameraMatrix();
+    Matrix4 cvvTransform = computeCVVMatrix();
+
+    matrix = multiplyMatrixWithMatrix(camTransform, cvvTransform);
 
     initializedMatrix = true;
     return matrix;

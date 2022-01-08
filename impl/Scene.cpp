@@ -46,19 +46,26 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			}
 		}
 
-		//world to camera transformation
+		// world to camera transformation +
+		// camera to view (cvv) transformation (inverts coordinate system)
 		T = multiplyMatrixWithMatrix(camera->getMatrix(),T);
 		
-		//camera to view(cvv?) transformation
+		//TODO
+		//apply T to all vertices & save new vertices
 
+		//TODO
 		//clipping & culling 
 		for(auto t: m->triangles){
 			//something something
 		}
 
-		//perspective divide
+		//TODO
+		if(camera->projectionType == 1){
+			//perspective divide
 
-		//view to viewport transformation
+		}
+
+		//viewport transformation
 
 		//rasterizer
 	}
