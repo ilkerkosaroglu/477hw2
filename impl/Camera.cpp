@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Helpers.h"
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -53,6 +54,25 @@ Camera::Camera(const Camera &other)
     this->horRes = other.horRes;
     this->verRes = other.verRes;
     this->outputFileName = other.outputFileName;
+}
+
+Matrix4 Camera::getMatrix(){
+    if(initializedMatrix){
+        return matrix;
+    }
+
+    Matrix4 translation = getIdentityMatrix();
+    translation.val[0][3]=pos.x;
+    translation.val[1][3]=pos.y;
+    translation.val[2][3]=pos.z;
+
+    double basis[4][4] = {{u.x,u.y,u.z,0},{v.x,v.y,v.z,0},{w.x,w.y,w.z,0},{0,0,0,1}};
+    Matrix4 basisMatrix(basis);
+
+    matrix = multiplyMatrixWithMatrix(basis,translation);
+
+    initializedMatrix = true;
+    return matrix;
 }
 
 ostream &operator<<(ostream &os, const Camera &c)

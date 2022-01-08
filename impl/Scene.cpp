@@ -47,13 +47,16 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 		}
 
 		//world to camera transformation
+		T = multiplyMatrixWithMatrix(camera->getMatrix(),T);
 		
-		//camera to view transformation
+		//camera to view(cvv?) transformation
 
 		//clipping & culling 
 		for(auto t: m->triangles){
 			//something something
 		}
+
+		//perspective divide
 
 		//view to viewport transformation
 

@@ -2,6 +2,7 @@
 #define __CAMERA_H__
 
 #include "Vec3.h"
+#include "Matrix4.h"
 #include <string>
 
 using namespace std;
@@ -24,6 +25,9 @@ public:
     int verRes;
     string outputFileName;
 
+    Matrix4 matrix;
+    bool initializedMatrix = false;
+
     Camera();
 
     Camera(int cameraId,
@@ -36,6 +40,8 @@ public:
            string outputFileName);
 
     Camera(const Camera &other);
+
+    Matrix4 getMatrix();
 
     friend std::ostream &operator<<(std::ostream &os, const Camera &c);
 };
