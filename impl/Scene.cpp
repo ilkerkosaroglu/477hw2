@@ -32,8 +32,8 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 		Matrix4 T(getIdentityMatrix());
 
 		//model transformations
-		for(int i=0;i<m->numberOfTransformations;i++){
-			int id=m->transformationIds[i];
+		for(int i=0;i<(m->numberOfTransformations);i++){
+			int id=m->transformationIds[i]-1;
 			char type=m->transformationTypes[i];
 			if(type=='r'){
 				T = multiplyMatrixWithMatrix(rotations[id]->getMatrix(),T);
