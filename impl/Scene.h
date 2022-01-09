@@ -25,6 +25,7 @@ class Scene
 public:
 	Color backgroundColor;
 	bool cullingEnabled;
+	bool drawingMode; //0: wireframe, 1:solid
 
 	vector< vector<Color> > image;
 	vector< Camera* > cameras;
@@ -43,7 +44,10 @@ public:
 	void writeImageToPPMFile(Camera* camera);
 	void convertPPMToPNG(string ppmFileName, int osType);
 
+	Color indexColor(int colorId);
 	void drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c);
+	void rasterizeLine(Vec4 a, Vec4 b);
+	void rasterizeTriangle(Vec4 a, Vec4 b, Vec4 c);
 };
 
 #endif

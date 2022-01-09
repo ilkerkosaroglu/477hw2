@@ -202,3 +202,10 @@ Vec4 multiplyMatrixWithVec4(Matrix4 m, Vec4 v)
 
     return Vec4(values[0], values[1], values[2], values[3], v.colorId);
 }
+
+Color mix(const Color &f, const Color &s, double t){
+    double r = f.r * (1 - t) + s.r * t;
+    double g = f.g * (1 - t) + s.g * t;
+    double b = f.b * (1 - t) + s.b * t;
+    return Color(r,g,b);
+}

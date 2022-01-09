@@ -29,6 +29,8 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 	// TODO: Implement this function.
 
 	for(auto m: meshes){
+		drawingMode = m->type;
+
 		Matrix4 T(getIdentityMatrix());
 
 		//model transformations
@@ -61,12 +63,93 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			c = multiplyMatrixWithVec4(T,c);
 
 			//TODO
-			//clipping & culling 
+			cerr<<a<<b<<c<<endl;
+			//clipping & culling
+			if(a.x<-1 || b.x<-1 || c.x<-1){
+				continue;
+			}
+			if(a.y<-1 || b.y<-1 || c.y<-1){
+				continue;
+			}
+			if(a.y>1 || b.y>1 || c.y>1){
+				continue;
+			}
+			if(a.y>1 || b.y>1 || c.y>1){
+				continue;
+			}
 
 			// if(shouldDraw)
-			drawTri(camera, a, b, c);
+			// drawTri(camera, a, b, c);
 		}
 	}
+}
+
+Color Scene::indexColor(int colorId){
+	return *colorsOfVertices[colorId-1];
+}
+
+void Scene::rasterizeLine(Vec4 a, Vec4 b){
+	Color c = indexColor(a.colorId);
+
+	if(a.x>b.x)
+	swap(a,b);
+
+	int x0 = 0, y0 = 0;
+	int x1 = 0, y1 = 0;
+
+	x0 = round(a.x);
+	x1 = round(b.x);
+	y0 = round(a.y);
+	y1 = round(b.y);
+
+	//TODO?
+	// x0 = max((double)0,round(a.x));
+	// x0 = min((double),round(a.x));
+
+	int dx = x1-x0;
+	int dy = y1-y0;
+
+	bool flipXY = false;
+	bool flipY = false;
+	if(dy>dx){
+		flipXY=true;
+		swap(x0,y0);
+		swap(x1,y1);
+		swap(dx,dy);
+	}
+
+	int p = -2*dy + dx;
+
+	Color dc = indexColor(b.colorId) - c;
+	dc.r /= dx;
+	dc.g /= dx;
+	dc.b /= dx;
+
+	int y=y0;
+	for(int x=x0;x<=x1;x++){
+		//draw px
+		if(flipXY){
+			swap(x,y);			
+		}
+		cerr<<x<<" "<<y<<endl;
+		image[x][y] = c;
+		if(flipXY){
+			swap(x,y);
+		}
+
+		if(p<0){//NE
+			y++;
+			p+=2*dx-2*dy;
+		}else{ //E
+			p+=-2*dy;
+		}
+
+		c.addColor(dc);
+	}
+}
+
+void Scene::rasterizeTriangle(Vec4 a, Vec4 b, Vec4 c){
+
 }
 
 void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){
@@ -77,6 +160,7 @@ void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){
 		b.applyPerspectiveDivision();
 		c.applyPerspectiveDivision();
 	}
+	cerr<<a<<endl;
 
 	//viewport transformation
 	int nx = camera->horRes, ny = camera->verRes;
@@ -85,9 +169,23 @@ void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){
 	a = multiplyMatrixWithVec4(Mvp,a);
 	b = multiplyMatrixWithVec4(Mvp,b);
 	c = multiplyMatrixWithVec4(Mvp,c);
+	cerr<<a<<endl;
 
-	//TODO
+
 	//rasterizer
+
+	//wireframe
+	if(drawingMode == 0){
+		rasterizeLine(a,b);
+		rasterizeLine(b,c);
+		rasterizeLine(c,a);
+	}
+
+	//solid
+	if(drawingMode == 1){
+		rasterizeTriangle(a,b,c);
+	}
+
 }
 
 /*

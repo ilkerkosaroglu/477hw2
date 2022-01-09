@@ -20,6 +20,16 @@ Color::Color(const Color &other)
     this->b = other.b;
 }
 
+void Color::addColor(const Color& other){
+    r+=other.r;
+    g+=other.g;
+    b+=other.b;
+}
+
+Color Color::operator-(const Color& o){
+    return Color(r-o.r,g-o.g,b-o.b);
+}
+
 ostream& operator<<(ostream& os, const Color& c)
 {
     os << fixed << setprecision(0) << "rgb(" << c.r << ", " << c.g << ", " << c.b << ")";
