@@ -88,10 +88,10 @@ Color Scene::indexColor(int colorId){
 }
 
 void Scene::rasterizeLine(Vec4 a, Vec4 b){
-	Color c = indexColor(a.colorId);
-
 	if(a.x>b.x)
 	swap(a,b);
+
+	Color c = indexColor(a.colorId);
 
 	int x0 = 0, y0 = 0;
 	int x1 = 0, y1 = 0;
@@ -130,7 +130,6 @@ void Scene::rasterizeLine(Vec4 a, Vec4 b){
 		if(flipXY){
 			swap(x,y);			
 		}
-		cerr<<x<<" "<<y<<endl;
 		image[x][y] = c;
 		if(flipXY){
 			swap(x,y);
@@ -159,7 +158,6 @@ void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){
 		b.applyPerspectiveDivision();
 		c.applyPerspectiveDivision();
 	}
-	cerr<<a<<endl;
 
 	//viewport transformation
 	int nx = camera->horRes, ny = camera->verRes;
@@ -168,8 +166,6 @@ void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){
 	a = multiplyMatrixWithVec4(Mvp,a);
 	b = multiplyMatrixWithVec4(Mvp,b);
 	c = multiplyMatrixWithVec4(Mvp,c);
-	cerr<<a<<endl;
-
 
 	//rasterizer
 
