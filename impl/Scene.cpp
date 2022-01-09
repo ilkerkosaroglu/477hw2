@@ -63,7 +63,6 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			c = multiplyMatrixWithVec4(T,c);
 
 			//TODO
-			cerr<<a<<b<<c<<endl;
 			//clipping & culling
 			if(a.x/a.t<-1 || b.x/b.t<-1 || c.x/c.t<-1){
 				continue;
@@ -79,7 +78,7 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			}
 
 			// if(shouldDraw)
-			// drawTri(camera, a, b, c);
+			drawTri(camera, a, b, c);
 		}
 	}
 }

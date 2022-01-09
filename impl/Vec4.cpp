@@ -45,6 +45,7 @@ void Vec4::applyPerspectiveDivision(){
     x = x/t;
     y = y/t;
     z = z/t;
+    t = 1;
 }
 
 double Vec4::getElementAt(int index)
