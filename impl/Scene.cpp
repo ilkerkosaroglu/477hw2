@@ -110,7 +110,12 @@ void Scene::rasterizeLine(Vec4 a, Vec4 b){
 
 	bool flipXY = false;
 	bool flipY = false;
-	if(dy>dx){
+	if(dy<0){
+		flipY=true;
+		dy*=-1;
+		y1+=2*dy;
+	}
+	if(abs(dy)>abs(dx)){
 		flipXY=true;
 		swap(x0,y0);
 		swap(x1,y1);
@@ -129,10 +134,19 @@ void Scene::rasterizeLine(Vec4 a, Vec4 b){
 		//draw px
 		if(flipXY){
 			swap(x,y);			
+			swap(x0,y0);			
+		}
+		int curdy = y-y0;
+		if(flipY){
+			y-=2*curdy;
 		}
 		image[x][y] = c;
+		if(flipY){
+			y+=2*curdy;
+		}
 		if(flipXY){
 			swap(x,y);
+			swap(x0,y0);			
 		}
 
 		if(p<0){//NE
