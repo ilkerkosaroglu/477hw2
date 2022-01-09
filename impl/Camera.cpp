@@ -96,7 +96,7 @@ Matrix4 Camera::getMatrix(){
     Matrix4 camTransform = computeCameraMatrix();
     Matrix4 cvvTransform = computeCVVMatrix();
 
-    matrix = multiplyMatrixWithMatrix(camTransform, cvvTransform);
+    matrix = multiplyMatrixWithMatrix(cvvTransform, camTransform);
 
     initializedMatrix = true;
     return matrix;
