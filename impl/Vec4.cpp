@@ -30,6 +30,23 @@ Vec4::Vec4(const Vec4 &other)
     this->colorId = other.colorId;
 }
 
+Vec4 Vec4::convertFromVec3(const Vec3 &other)
+{
+    Vec4 res;
+    res.x = other.x;
+    res.y = other.y;
+    res.z = other.z;
+    res.t = 1;
+    res.colorId = other.colorId;
+    return res;
+}
+
+void Vec4::applyPerspectiveDivision(){
+    x = x/t;
+    y = y/t;
+    z = z/t;
+}
+
 double Vec4::getElementAt(int index)
 {
     switch (index)

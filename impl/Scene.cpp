@@ -49,26 +49,45 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 		// world to camera transformation +
 		// camera to view (cvv) transformation (inverts coordinate system)
 		T = multiplyMatrixWithMatrix(camera->getMatrix(),T);
-		
-		//TODO
-		//apply T to all vertices & save new vertices
 
-		//TODO
-		//clipping & culling 
 		for(auto t: m->triangles){
-			//something something
+			Vec4 a = Vec4::convertFromVec3(*vertices[t.vertexIds[0]-1]);
+			Vec4 b = Vec4::convertFromVec3(*vertices[t.vertexIds[1]-1]);
+			Vec4 c = Vec4::convertFromVec3(*vertices[t.vertexIds[2]-1]);
+
+			//apply T to all vertices
+			a = multiplyMatrixWithVec4(T,a);
+			b = multiplyMatrixWithVec4(T,b);
+			c = multiplyMatrixWithVec4(T,c);
+
+			//TODO
+			//clipping & culling 
+
+			// if(shouldDraw)
+			drawTri(camera, a, b, c);
 		}
-
-		//TODO
-		if(camera->projectionType == 1){
-			//perspective divide
-
-		}
-
-		//viewport transformation
-
-		//rasterizer
 	}
+}
+
+void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){
+	if(camera->projectionType == 1){
+		//perspective divide
+		//! what about a.t = 0?
+		a.applyPerspectiveDivision();
+		b.applyPerspectiveDivision();
+		c.applyPerspectiveDivision();
+	}
+
+	//viewport transformation
+	int nx = camera->horRes, ny = camera->verRes;
+	double vpVal[4][4] = {{nx/2.0,0,0,(nx-1)/2.0},{0,ny/2.0,0,(ny-1)/2.0},{0,0,1/2.0,1/2.0},{0,0,0,0}};
+	Matrix4 Mvp(vpVal);
+	a = multiplyMatrixWithVec4(Mvp,a);
+	b = multiplyMatrixWithVec4(Mvp,b);
+	c = multiplyMatrixWithVec4(Mvp,c);
+
+	//TODO
+	//rasterizer
 }
 
 /*
