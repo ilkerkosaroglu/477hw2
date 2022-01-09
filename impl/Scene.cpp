@@ -65,16 +65,16 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			//TODO
 			cerr<<a<<b<<c<<endl;
 			//clipping & culling
-			if(a.x<-1 || b.x<-1 || c.x<-1){
+			if(a.x/a.t<-1 || b.x/b.t<-1 || c.x/c.t<-1){
 				continue;
 			}
-			if(a.y<-1 || b.y<-1 || c.y<-1){
+			if(a.y/a.t<-1 || b.y/b.t<-1 || c.y/c.t<-1){
 				continue;
 			}
-			if(a.y>1 || b.y>1 || c.y>1){
+			if(a.x/a.t>1 || b.x/b.t>1 || c.x/c.t>1){
 				continue;
 			}
-			if(a.y>1 || b.y>1 || c.y>1){
+			if(a.y/a.t>1 || b.y/b.t>1 || c.y/c.t>1){
 				continue;
 			}
 
