@@ -101,10 +101,6 @@ void Scene::rasterizeLine(Vec4 a, Vec4 b){
 	y0 = round(a.y);
 	y1 = round(b.y);
 
-	//TODO?
-	// x0 = max((double)0,round(a.x));
-	// x0 = min((double),round(a.x));
-
 	int dx = x1-x0;
 	int dy = y1-y0;
 
@@ -159,9 +155,38 @@ void Scene::rasterizeLine(Vec4 a, Vec4 b){
 		c.addColor(dc);
 	}
 }
-
+int lineEq(int x0, int y0, int x1, int y1, int x, int y){
+	return x*(y0-y1) + y*(x1-x0) + x0*y1 - y0*x1;
+}
+int lineEqVec(Vec4 a, Vec4 b, int x, int y){
+	return lineEq(a.x, a.y, b.x, b.y, x, y);
+}
 void Scene::rasterizeTriangle(Vec4 a, Vec4 b, Vec4 c){
 
+	//? when should we round things?
+	
+	int minX = min(min(round(a.x),round(b.x)),round(c.x));
+	int minY = min(min(round(a.y),round(b.y)),round(c.y));
+	int maxX = max(max(round(a.x),round(b.x)),round(c.x));
+	int maxY = max(max(round(a.y),round(b.y)),round(c.y));
+
+	// a.x = round(a.x); a.y = round(a.y); a.z = round(a.z);
+	// b.x = round(b.x); b.y = round(b.y); b.z = round(b.z);
+	// c.x = round(c.x); c.y = round(c.y); c.z = round(c.z);
+
+	for(int x=minX;x<=maxX;x++){
+		for(int y=minY;y<=maxY;y++){
+			double alpha = (double)lineEqVec(b, c, x, y) / lineEqVec(b, c, a.x, a.y);
+			double beta = (double)lineEqVec(c, a, x, y) / lineEqVec(c, a, b.x, b.y);
+			double gamma = (double)lineEqVec(a, b, x, y) / lineEqVec(a, b, c.x, c.y);
+			if(alpha>=0 && beta>=0 && gamma>=0){
+				Color col = indexColor(a.colorId)*alpha + indexColor(b.colorId)*beta + indexColor(c.colorId)*gamma;
+				image[x][y] = Color(round(col.r), round(col.g), round(col.b));
+				// image[x][y] = col; //we can also do this, but it changes the colors slightly(?)
+			}
+		}
+	}
+	
 }
 
 void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){

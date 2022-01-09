@@ -14,6 +14,8 @@ public:
     void addColor(const Color& other);
     friend std::ostream& operator<<(std::ostream& os, const Color& c);
     Color operator-(const Color& o);
+    Color operator+(const Color& o);
+    Color operator*(double k);
 };
 
 #endif

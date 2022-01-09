@@ -30,6 +30,14 @@ Color Color::operator-(const Color& o){
     return Color(r-o.r,g-o.g,b-o.b);
 }
 
+Color Color::operator*(double k){
+    return Color(r*k,g*k,b*k);
+}
+
+Color Color::operator+(const Color& o){
+    return Color(r+o.r,g+o.g,b+o.b);
+}
+
 ostream& operator<<(ostream& os, const Color& c)
 {
     os << fixed << setprecision(0) << "rgb(" << c.r << ", " << c.g << ", " << c.b << ")";
