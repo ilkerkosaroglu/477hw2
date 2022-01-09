@@ -78,7 +78,7 @@ Matrix4 Camera::computeCVVMatrix(){
     Matrix4 ortho(oVal);
 
     //if perspective
-    if(projectionType == 0){
+    if(projectionType == 1){
         double pVal[4][4] = {{near,0,0,0},{0,near,0,0},{0,0,far+near,far*near},{0,0,-1,0}};
         Matrix4 pers(pVal);
         M = multiplyMatrixWithMatrix(pers,M);
