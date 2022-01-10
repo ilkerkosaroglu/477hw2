@@ -81,10 +81,10 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				Vec3 eyeDir;
 				if(camera->projectionType==0){
 					//ortho
-					eyeDir = normalizeVec3(inverseVec3(camera->w));
+					eyeDir = normalizeVec3(camera->w);
 				}else{
 					//perspective
-					eyeDir = normalizeVec3(subtractVec3(a3,camera->pos));
+					eyeDir = normalizeVec3(subtractVec3(camera->pos,a3));
 				}
 
 				//skip the object if it is facing away
