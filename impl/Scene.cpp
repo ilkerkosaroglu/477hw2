@@ -89,6 +89,9 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			}
 
 			vector<Vec4> points;
+			points.push_back(a);
+			points.push_back(b);
+			points.push_back(c);
 			for(auto &k:points){
 				
 				//perspective division
@@ -102,13 +105,13 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			}
 
 			if(drawingMode==0){
-				for(int i=0;i<points.size()-2;i++){
+				for(int i=0;i<points.size()-1;i++){
 					rasterizeLine(points[i],points[i+1]);
 				}
 			}
 
 			if(drawingMode==1){
-				for(int i=0;i<points.size()-3;i++){
+				for(int i=0;i<points.size()-2;i++){
 					rasterizeTriangle(points[i],points[i+1],points[i+2]);
 				}
 			}
