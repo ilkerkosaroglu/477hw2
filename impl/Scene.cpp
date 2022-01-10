@@ -68,16 +68,19 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 
 			//backface culling
 			if(cullingEnabled){
-				Vec3 a3(a.x,a.y,a.z,-1);
-				Vec3 b3(b.x,b.y,b.z,-1);
-				Vec3 c3(c.x,c.y,c.z,-1);
+				Vec3 a3(a.x/a.t,a.y/a.t,a.z/a.t,-1);
+				Vec3 b3(b.x/b.t,b.y/b.t,b.z/b.t,-1);
+				Vec3 c3(c.x/c.t,c.y/c.t,c.z/c.t,-1);
 
 				//unit normal vector of the triangle
 				Vec3 n = normalizeVec3(crossProductVec3(subtractVec3(b3,a3),subtractVec3(c3,a3)));
 
+				Vec3 center = multiplyVec3WithScalar(addVec3(addVec3(a3,b3),c3),1/3.0);
 				//unit looking direction (to the object)
-				Vec3 eyeDir = normalizeVec3(subtractVec3(a3,camera->pos));
-
+				Vec3 eyeDir = normalizeVec3(subtractVec3(center,camera->pos));
+				cerr<<n<<endl;
+				cerr<<eyeDir<<endl;
+				cerr<<dotProductVec3(n,eyeDir)<<endl<<endl;
 				//skip the object if it is facing away
 				if(dotProductVec3(n,eyeDir)<0){
 					continue;
