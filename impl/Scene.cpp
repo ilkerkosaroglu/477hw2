@@ -26,7 +26,11 @@ using namespace std;
 */
 void Scene::forwardRenderingPipeline(Camera *camera)
 {
-	// TODO: Implement this function.
+	//viewport transformation
+	int nx = camera->horRes, ny = camera->verRes;
+	double vpVal[4][4] = {{nx/2.0,0,0,(nx-1)/2.0},{0,ny/2.0,0,(ny-1)/2.0},{0,0,1/2.0,1/2.0},{0,0,0,0}};
+	Matrix4 Mvp(vpVal);
+
 
 	for(auto m: meshes){
 		drawingMode = m->type;
@@ -63,7 +67,14 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			c = multiplyMatrixWithVec4(T,c);
 
 			//TODO
-			//clipping & culling
+			//backface culling
+			// if(flag){
+			// 	continue;
+			// }
+
+			//clipping
+
+			//TODO note: dummy clipping below, delete it ASAP
 			if(a.x/a.t<-1 || b.x/b.t<-1 || c.x/c.t<-1){
 				continue;
 			}
@@ -77,8 +88,31 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				continue;
 			}
 
-			// if(shouldDraw)
-			drawTri(camera, a, b, c);
+			vector<Vec4> points;
+			for(auto &k:points){
+				
+				//perspective division
+				if(camera->projectionType == 1){
+					//! what about a.t = 0?
+					k.applyPerspectiveDivision();
+				}
+				
+				//viewport transformation
+				k = multiplyMatrixWithVec4(Mvp, k);
+			}
+
+			if(drawingMode==0){
+				for(int i=0;i<points.size()-2;i++){
+					rasterizeLine(points[i],points[i+1]);
+				}
+			}
+
+			if(drawingMode==1){
+				for(int i=0;i<points.size()-3;i++){
+					rasterizeTriangle(points[i],points[i+1],points[i+2]);
+				}
+			}
+
 		}
 	}
 }
@@ -164,7 +198,7 @@ int lineEqVec(Vec4 a, Vec4 b, int x, int y){
 void Scene::rasterizeTriangle(Vec4 a, Vec4 b, Vec4 c){
 
 	//? when should we round things?
-	
+
 	int minX = min(min(round(a.x),round(b.x)),round(c.x));
 	int minY = min(min(round(a.y),round(b.y)),round(c.y));
 	int maxX = max(max(round(a.x),round(b.x)),round(c.x));
@@ -187,39 +221,6 @@ void Scene::rasterizeTriangle(Vec4 a, Vec4 b, Vec4 c){
 		}
 	}
 	
-}
-
-void Scene::drawTri(Camera *camera, Vec4 a, Vec4 b, Vec4 c){
-	if(camera->projectionType == 1){
-		//perspective divide
-		//! what about a.t = 0?
-		a.applyPerspectiveDivision();
-		b.applyPerspectiveDivision();
-		c.applyPerspectiveDivision();
-	}
-
-	//viewport transformation
-	int nx = camera->horRes, ny = camera->verRes;
-	double vpVal[4][4] = {{nx/2.0,0,0,(nx-1)/2.0},{0,ny/2.0,0,(ny-1)/2.0},{0,0,1/2.0,1/2.0},{0,0,0,0}};
-	Matrix4 Mvp(vpVal);
-	a = multiplyMatrixWithVec4(Mvp,a);
-	b = multiplyMatrixWithVec4(Mvp,b);
-	c = multiplyMatrixWithVec4(Mvp,c);
-
-	//rasterizer
-
-	//wireframe
-	if(drawingMode == 0){
-		rasterizeLine(a,b);
-		rasterizeLine(b,c);
-		rasterizeLine(c,a);
-	}
-
-	//solid
-	if(drawingMode == 1){
-		rasterizeTriangle(a,b,c);
-	}
-
 }
 
 /*
