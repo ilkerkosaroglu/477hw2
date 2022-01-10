@@ -61,37 +61,44 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			Vec4 b = Vec4::convertFromVec3(*vertices[t.vertexIds[1]-1]);
 			Vec4 c = Vec4::convertFromVec3(*vertices[t.vertexIds[2]-1]);
 
-			//apply T to all vertices
+			//apply transform T to all vertices
 			a = multiplyMatrixWithVec4(T,a);
 			b = multiplyMatrixWithVec4(T,b);
 			c = multiplyMatrixWithVec4(T,c);
 
-			//TODO
 			//backface culling
-			// if(flag){
-			// 	continue;
-			// }
+			if(cullingEnabled){
+				Vec3 a3(a.x,a.y,a.z,-1);
+				Vec3 b3(b.x,b.y,b.z,-1);
+				Vec3 c3(c.x,c.y,c.z,-1);
+
+				//unit normal vector of the triangle
+				Vec3 n = normalizeVec3(crossProductVec3(subtractVec3(b3,a3),subtractVec3(c3,a3)));
+
+				//unit looking direction (to the object)
+				Vec3 eyeDir = normalizeVec3(subtractVec3(a3,camera->pos));
+
+				//skip the object if it is facing away
+				if(dotProductVec3(n,eyeDir)<0){
+					continue;
+				}
+			}
 
 			//clipping
-
-			//TODO note: dummy clipping below, delete it ASAP
-			if(a.x/a.t<-1 || b.x/b.t<-1 || c.x/c.t<-1){
-				continue;
-			}
-			if(a.y/a.t<-1 || b.y/b.t<-1 || c.y/c.t<-1){
-				continue;
-			}
-			if(a.x/a.t>1 || b.x/b.t>1 || c.x/c.t>1){
-				continue;
-			}
-			if(a.y/a.t>1 || b.y/b.t>1 || c.y/c.t>1){
-				continue;
-			}
-
 			vector<Vec4> points;
-			points.push_back(a);
-			points.push_back(b);
-			points.push_back(c);
+
+			//wireframe
+			if(drawingMode==0){
+				clipLine(a,b,points);
+				clipLine(b,c,points);
+				clipLine(c,a,points);
+			}
+
+			//solid
+			if(drawingMode==1){
+				clipTriangle(a,b,c,points);
+			}
+
 			for(auto &k:points){
 				
 				//perspective division
@@ -104,12 +111,14 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				k = multiplyMatrixWithVec4(Mvp, k);
 			}
 
+			//wireframe
 			if(drawingMode==0){
 				for(int i=0;i<points.size()-1;i++){
 					rasterizeLine(points[i],points[i+1]);
 				}
 			}
 
+			//solid
 			if(drawingMode==1){
 				for(int i=0;i<points.size()-2;i++){
 					rasterizeTriangle(points[i],points[i+1],points[i+2]);
@@ -119,6 +128,20 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 		}
 	}
 }
+
+//TODO
+void Scene::clipTriangle(Vec4 a, Vec4 b, Vec4 c, vector<Vec4> &points){
+	points.push_back(a);
+	points.push_back(b);
+	points.push_back(c);
+}
+
+//TODO
+void Scene::clipLine(Vec4 a, Vec4 b, vector<Vec4> &points){
+	points.push_back(a);
+	points.push_back(b);
+}
+
 
 Color Scene::indexColor(int colorId){
 	return *colorsOfVertices[colorId-1];
