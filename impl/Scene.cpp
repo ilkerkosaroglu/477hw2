@@ -52,31 +52,40 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			}
 		}
 
-		// world to camera transformation +
-		// camera to view (cvv) transformation (inverts coordinate system)
-		T = multiplyMatrixWithMatrix(camera->getMatrix(),T);
-
 		for(auto t: m->triangles){
 			Vec4 a = Vec4::convertFromVec3(*vertices[t.vertexIds[0]-1]);
 			Vec4 b = Vec4::convertFromVec3(*vertices[t.vertexIds[1]-1]);
 			Vec4 c = Vec4::convertFromVec3(*vertices[t.vertexIds[2]-1]);
 
-			//apply transform T to all vertices
-			a = multiplyMatrixWithVec4(T,a);
-			b = multiplyMatrixWithVec4(T,b);
-			c = multiplyMatrixWithVec4(T,c);
+			//save world coordinates
+			Vec4 aW = multiplyMatrixWithVec4(T, a);
+			Vec4 bW = multiplyMatrixWithVec4(T, b);
+			Vec4 cW = multiplyMatrixWithVec4(T, c);
+
+			// world to camera transformation +
+			// camera to view (cvv) transformation (inverts coordinate system)
+			a = multiplyMatrixWithVec4(camera->getMatrix(),aW);
+			b = multiplyMatrixWithVec4(camera->getMatrix(),bW);
+			c = multiplyMatrixWithVec4(camera->getMatrix(),cW);
 
 			//backface culling
 			if(cullingEnabled){
-				Vec3 a3(a.x,a.y,a.z,-1);
-				Vec3 b3(b.x,b.y,b.z,-1);
-				Vec3 c3(c.x,c.y,c.z,-1);
+				Vec3 a3(aW.x,aW.y,aW.z,-1);
+				Vec3 b3(bW.x,bW.y,bW.z,-1);
+				Vec3 c3(cW.x,cW.y,cW.z,-1);
 
 				//unit normal vector of the triangle
 				Vec3 n = normalizeVec3(crossProductVec3(subtractVec3(b3,a3),subtractVec3(c3,a3)));
 
 				//unit looking direction (to the object)
-				Vec3 eyeDir = normalizeVec3(subtractVec3(a3,camera->pos));
+				Vec3 eyeDir;
+				if(camera->projectionType==0){
+					//ortho
+					eyeDir = normalizeVec3(inverseVec3(camera->w));
+				}else{
+					//perspective
+					eyeDir = normalizeVec3(subtractVec3(a3,camera->pos));
+				}
 
 				//skip the object if it is facing away
 				if(dotProductVec3(n,eyeDir)<0){

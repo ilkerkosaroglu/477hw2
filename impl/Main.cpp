@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 
         for (int i = 0; i < scene->cameras.size(); i++)
         {
+            if(i!=4)continue;
             // initialize image with basic values
             scene->initializeImage(scene->cameras[i]);
 
