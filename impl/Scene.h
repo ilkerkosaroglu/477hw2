@@ -45,6 +45,7 @@ public:
 	void convertPPMToPNG(string ppmFileName, int osType);
 
 	Color indexColor(int colorId);
+	void addPoints(int axis, double col, bool insideIsLeft, Vec4 a, Vec4 b, vector<Vec4> &points);
 
 	void clipLine(Vec4 a, Vec4 b, vector<Vec4> &points);
 	void clipTriangle(Vec4 a, Vec4 b, Vec4 c, vector<Vec4> &points);

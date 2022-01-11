@@ -78,4 +78,7 @@ Vec4 multiplyMatrixWithVec4(Matrix4 m, Vec4 v);
 //mix colors using an interpolation value t.
 Color mix(const Color &a, const Color &b, double t);
 
+//mix vectors using an interpolation value t.
+Vec4 interpVec4(const Vec4 &f,const Vec4 &s, double t);
+
 #endif

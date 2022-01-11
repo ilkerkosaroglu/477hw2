@@ -209,3 +209,11 @@ Color mix(const Color &f, const Color &s, double t){
     double b = f.b * (1 - t) + s.b * t;
     return Color(r,g,b);
 }
+
+Vec4 interpVec4(const Vec4 &f,const Vec4 &s, double t){
+    double x = f.x * (1 - t) + s.x * t;
+    double y = f.y * (1 - t) + s.y * t;
+    double z = f.z * (1 - t) + s.z * t;
+    double w = f.t * (1 - t) + s.t * t;
+    return Vec4(x,y,z,w,-1);
+}

@@ -93,6 +93,13 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				}
 			}
 
+			//perspective division
+			if(camera->projectionType == 1){
+				//! what about a.t = 0?
+				a.applyPerspectiveDivision();
+				b.applyPerspectiveDivision();
+				c.applyPerspectiveDivision();
+			}
 			//clipping
 			vector<Vec4> points;
 
@@ -109,40 +116,80 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			}
 
 			for(auto &k:points){
-				
-				//perspective division
-				if(camera->projectionType == 1){
-					//! what about a.t = 0?
-					k.applyPerspectiveDivision();
-				}
-				
 				//viewport transformation
 				k = multiplyMatrixWithVec4(Mvp, k);
 			}
 
+			//rasterization
+
 			//wireframe
 			if(drawingMode==0){
-				for(int i=0;i<points.size()-1;i++){
+				for(int i=0;i<(int)points.size()-1;i+=2){
 					rasterizeLine(points[i],points[i+1]);
 				}
 			}
 
 			//solid
 			if(drawingMode==1){
-				for(int i=0;i<points.size()-2;i++){
+				for(int i=0;i<(int)points.size()-2;i+=3){
 					rasterizeTriangle(points[i],points[i+1],points[i+2]);
 				}
 			}
-
 		}
 	}
 }
 
-//TODO
+void Scene::addPoints(int axis, double col, bool insideIsLeft, Vec4 a, Vec4 b, vector<Vec4> &points){
+	double distA = abs(a.getElementAt(axis)-col);
+	double distB = abs(b.getElementAt(axis)-col);
+	double t = (distA)/(distA+distB);
+
+	bool aInside = (a.getElementAt(axis) < col) ^ !insideIsLeft;
+	bool bInside = (b.getElementAt(axis) < col) ^ !insideIsLeft;
+
+	if(aInside ^ bInside){
+		colorsOfVertices.push_back(new Color(mix(indexColor(a.colorId),indexColor(b.colorId),t)));
+		Vec4 p = interpVec4(a,b,t);
+		p.colorId = colorsOfVertices.size();
+		points.push_back(p);
+	}
+
+	if(bInside){
+		points.push_back(b);
+	}
+}
+
 void Scene::clipTriangle(Vec4 a, Vec4 b, Vec4 c, vector<Vec4> &points){
-	points.push_back(a);
-	points.push_back(b);
-	points.push_back(c);
+	vector<Vec4> p2;
+	p2.push_back(a);
+	p2.push_back(b);
+	p2.push_back(c);
+
+	//clip for each axis, and each column of the axis
+	for(int axis=0;axis<3;axis++){
+		for(int i=0;i<2;i++){
+			vector<Vec4> generatedP;
+			for(int p=0;p<p2.size();p++){
+				addPoints(axis,2*i-1,i,p2[p],p2[(p+1)%p2.size()],generatedP);
+			}
+			//cull if everything is outside
+			if(generatedP.size()<3){
+				return;
+			}
+			p2.clear();
+			p2.push_back(generatedP.back());
+			for(int p=0;p<generatedP.size()-1;p++){
+				p2.push_back(generatedP[p]);
+			}
+		}
+	}
+
+	//tessellate
+	for(int i=1;i<p2.size()-1;i++){
+		points.push_back(p2[0]);
+		points.push_back(p2[i]);
+		points.push_back(p2[i+1]);
+	}
 }
 
 //TODO
