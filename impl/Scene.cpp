@@ -234,15 +234,16 @@ void Scene::clipLine(Vec4 a, Vec4 b, vector<Vec4> &points){
 	Vec4 resB = b;
 	Color ca = indexColor(a.colorId);
 	Color cb = indexColor(b.colorId);
+	const double E = 0.0000001;
 	if(tL<1){
 		colorsOfVertices.push_back(new Color(ca+(cb-ca)*tL));
-		Vec4 p = interpVec4(a,b,tL);
+		Vec4 p = interpVec4(a,b,tL-E);
 		p.colorId = colorsOfVertices.size();
 		resB = p;
 	}
 	if(tE>0){
 		colorsOfVertices.push_back(new Color(ca+(cb-ca)*tE));
-		Vec4 p = interpVec4(a,b,tE);
+		Vec4 p = interpVec4(a,b,tE+E);
 		p.colorId = colorsOfVertices.size();
 		resA = p;
 	}
