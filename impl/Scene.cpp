@@ -192,10 +192,62 @@ void Scene::clipTriangle(Vec4 a, Vec4 b, Vec4 c, vector<Vec4> &points){
 	}
 }
 
-//TODO
+bool visible(double den, double num, double &tE, double &tL){
+	// potentially entering
+	if (den > 0){
+		double t = num / den;
+		if (t > tL){
+			return false;
+		}
+		if (t > tE){
+			tE = t;
+		}
+	} 
+	// potentially leaving
+	else if (den < 0){
+		double t = num / den;
+		if (t < tE){
+			return false;
+		}
+		if (t < tL){
+			tL = t;
+		}
+
+	}
+	// line parallel to edge
+	else if (num > 0){
+		return false;
+	}
+	return true;
+}
+
 void Scene::clipLine(Vec4 a, Vec4 b, vector<Vec4> &points){
-	points.push_back(a);
-	points.push_back(b);
+	double tE=0, tL=1;
+	bool vis = true;
+	Vec4 d(b.x-a.x,b.y-a.y,b.z-a.z,0,-1);
+	for(int axis=0;axis<3;axis++){
+		vis = vis && visible(d.getElementAt(axis),-1-a.getElementAt(axis),tE,tL);
+		vis = vis && visible(-d.getElementAt(axis),a.getElementAt(axis)-1,tE,tL);
+	}
+	if(!vis) return;
+	Vec4 resA = a;
+	Vec4 resB = b;
+	Color ca = indexColor(a.colorId);
+	Color cb = indexColor(b.colorId);
+	if(tL<1){
+		colorsOfVertices.push_back(new Color(ca+(cb-ca)*tL));
+		Vec4 p = interpVec4(a,b,tL);
+		p.colorId = colorsOfVertices.size();
+		resB = p;
+	}
+	if(tE>0){
+		colorsOfVertices.push_back(new Color(ca+(cb-ca)*tE));
+		Vec4 p = interpVec4(a,b,tE);
+		p.colorId = colorsOfVertices.size();
+		resA = p;
+	}
+	points.push_back(resA);
+	points.push_back(resB);
 }
 
 
